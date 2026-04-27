@@ -83,6 +83,7 @@ trait ShorterThanN[T](val n: Int) extends Parser[T]:
   def parserNTCNE = new BasicParser(Set('X', 'Y', 'Z'))
     with NotTwoConsecutive[Char]
     with NonEmpty[Char]
+  // NonEmpty[Char] -> NotTwoConsecutive[Char] -> BasicParser -> Parser[Char]
   println(parserNTCNE.parseAll("XYZ".toList)) // true
   println(parserNTCNE.parseAll("XYYZ".toList)) // false
   println(parserNTCNE.parseAll("".toList)) // false
