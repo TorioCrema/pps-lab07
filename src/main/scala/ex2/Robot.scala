@@ -45,21 +45,23 @@ class LoggingRobot(val robot: Robot) extends Robot:
     println(robot.toString)
 
 class RobotWithBattery(val robot: Robot, var battery: Int) extends Robot:
-
   export robot.{position, direction}
-
   override def act(): Unit = this.executeAndDischarge(this.robot.act)
-
   override def turn(dir: Direction): Unit = this.executeAndDischarge(() => this.robot.turn(dir))
-
   private def decreaseCharge(): Unit = this.battery -= 1
-
   private def isCharged = this.battery > 0
-
   private def executeAndDischarge(action: () => Unit): Unit =
     if this.isCharged then
       action()
       this.decreaseCharge()
+
+class RobotCanFail(val robot: Robot, val failChance: Double) extends Robot:
+  require(0.0 <= failChance && 1.0 > failChance)
+  export robot.{position, direction}
+  private var generator: scala.util.Random = scala.util.Random()
+  override def act(): Unit = if this.generator.nextDouble() > this.failChance then robot.act() else ()
+  override def turn(dir: Direction): Unit = if this.generator.nextDouble() > this.failChance then robot.turn(dir) else ()
+  def setSeed(seed: Int): Unit = this.generator = scala.util.Random(seed)
 
 
 @main def testRobot(): Unit =
