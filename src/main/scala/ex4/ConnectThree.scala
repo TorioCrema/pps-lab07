@@ -1,6 +1,7 @@
 package ex4
 
 import java.util.OptionalInt
+import scala.annotation.tailrec
 
 // Optional!
 object ConnectThree extends App:
@@ -27,11 +28,24 @@ object ConnectThree extends App:
 
   import Player.*
 
-  def find(board: Board, x: Int, y: Int): Option[Player] = ???
+  @tailrec
+  def find(board: Board, x: Int, y: Int): Option[Player] = board match
+    case disk :: t => if disk.x == x && disk.y == y then Some(disk.player) else find(t, x, y)
+    case _ => Option.empty
 
-  def firstAvailableRow(board: Board, x: Int): Option[Int] = ???
+  def firstAvailableRow(board: Board, x: Int): Option[Int] =
+    val columnX: Seq[Disk] = board.filter(_.x == x)
+    if columnX.isEmpty
+      then Some(0)
+    else
+      val maxY: Int = columnX.map(_.y).max
+      if maxY + 1 > bound then Option.empty else Some(maxY + 1)
 
-  def placeAnyDisk(board: Board, player: Player): Seq[Board] = ???
+  def placeAnyDisk(board: Board, player: Player): Seq[Board] =
+    for
+      x <- 0 to 3
+      y <- firstAvailableRow(board, x)
+    yield board :+ Disk(x, y, player)
 
   def computeAnyGame(player: Player, moves: Int): LazyList[Game] = ???
 
